@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <cassert>
 #include "vector.h"  // for default underlying container
 #include <stdexcept> // for out_of_range
 
@@ -169,8 +168,9 @@ namespace custom
 
       if (container[indexHeap - 1] < container[indexBigger - 1])
       {
-         //using namespace std;
-         std::swap(std::move(container[indexHeap - 1]), std::move(container[indexBigger - 1]));
+         using std::swap;  // Brings std::swap into scope as a fallback,
+                           // and allows ADL to find a better match
+         swap(container[indexHeap - 1], container[indexBigger - 1]);
          percolateDown(indexBigger);
          return true;
       }
