@@ -202,3 +202,9 @@ private:
 };
 
 inline void swap(Spy & lhs, Spy & rhs) { lhs.swap(rhs);}
+
+
+std::ostream& operator <<(std::ostream& out, const Spy t)
+{
+   return out << "Spy(" << t.get() << ")";
+}
