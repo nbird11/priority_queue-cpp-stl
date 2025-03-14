@@ -43,14 +43,18 @@ namespace custom
       //
       // construct
       //
-      priority_queue(const Compare& c = Compare()) : container(Container()), compare(c)
+      priority_queue(const Compare& c = Compare())
+         : compare(c)
       {}
-      priority_queue(const priority_queue& rhs, const Compare& c = Compare()) : container(rhs.container), compare(c)
+      priority_queue(const priority_queue& rhs, const Compare& c = Compare())
+         : container(rhs.container), compare(c)
       {}
-      priority_queue(priority_queue&& rhs, const Compare& c = Compare()) : container(std::move(rhs.container)), compare(c)
+      priority_queue(priority_queue&& rhs, const Compare& c = Compare())
+         : container(std::move(rhs.container)), compare(c)
       {}
       template <class Iterator>
-      priority_queue(Iterator first, Iterator last, const Compare& c = Compare()) : compare(c)
+      priority_queue(Iterator first, Iterator last, const Compare& c = Compare())
+         : compare(c)
       {
          container.reserve(last - first);
          while (first != last)
@@ -59,12 +63,16 @@ namespace custom
             first++;
          }
       }
-      explicit priority_queue(const Compare& c, Container&& rhs) : compare(c), container(std::move(rhs))
+      explicit priority_queue(const Compare& c, Container&& rhs)
+         : compare(c), container(std::move(rhs))
       {
          heapify();
       }
-      explicit priority_queue(const Compare& c, Container& rhs) : compare(c), container(rhs)
-      {}
+      explicit priority_queue(const Compare& c, Container& rhs)
+         : compare(c), container(rhs)
+      {
+         heapify();
+      }
       ~priority_queue()
       {
          container.clear();
@@ -131,7 +139,7 @@ namespace custom
 
       using std::swap;  // Brings std::swap into scope as a fallback,
                         // and allows ADL to find a better match
-      swap(container[0], container[size() - 1]);
+      swap(container.front(), container.back());
       container.pop_back();
       percolateDown(1 /*heap index*/);
    }
@@ -171,6 +179,7 @@ namespace custom
 
       size_t indexBigger = 0;
 
+      // subtracting 1 converts 1-based heap index to 0-based container index
       if (indexRight <= size() && compare(container[indexLeft - 1], container[indexRight - 1]))
          indexBigger = indexRight;
       else
