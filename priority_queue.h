@@ -52,6 +52,7 @@ namespace custom
       template <class Iterator>
       priority_queue(Iterator first, Iterator last, const Compare& c = Compare()) : compare(c)
       {
+         container.reserve(last - first);
          while (first != last)
          {
             push(*first);
@@ -59,11 +60,15 @@ namespace custom
          }
       }
       explicit priority_queue(const Compare& c, Container&& rhs) : compare(c), container(std::move(rhs))
-      {}
+      {
+         heapify();
+      }
       explicit priority_queue(const Compare& c, Container& rhs) : compare(c), container(rhs)
       {}
       ~priority_queue()
-      {}
+      {
+         container.clear();
+      }
 
       //
       // Access
@@ -121,7 +126,15 @@ namespace custom
     **********************************************/
    template <class T, class Container, class Compare>
    void priority_queue<T, Container, Compare>::pop()
-   {}
+   {
+      if (empty()) return;
+
+      using std::swap;  // Brings std::swap into scope as a fallback,
+                        // and allows ADL to find a better match
+      swap(container[0], container[size() - 1]);
+      container.pop_back();
+      percolateDown(1 /*heap index*/);
+   }
 
    /*****************************************
     * P QUEUE :: PUSH
@@ -158,15 +171,12 @@ namespace custom
 
       size_t indexBigger = 0;
 
-      if (indexRight <= size())
-         if (container[indexLeft - 1] < container[indexRight - 1])
-            indexBigger = indexRight;
-         else
-            indexBigger = indexLeft;
+      if (indexRight <= size() && compare(container[indexLeft - 1], container[indexRight - 1]))
+         indexBigger = indexRight;
       else
-         return false;
+         indexBigger = indexLeft;
 
-      if (container[indexHeap - 1] < container[indexBigger - 1])
+      if (indexBigger <= size() && compare(container[indexHeap - 1], container[indexBigger - 1]))
       {
          using std::swap;  // Brings std::swap into scope as a fallback,
                            // and allows ADL to find a better match
